@@ -17,11 +17,11 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: hypomos-webhook-lb
+  name: plex-webhook-lb
   namespace: media
 spec:
   selector:
-    app: hypomos-webhook
+    app: plex-webhook
   type: LoadBalancer
   ports:
     - protocol: TCP
@@ -48,6 +48,6 @@ spec:
       - name: pipeline-docker-registry
       containers:
       - name: plex-webhook
-        image: ${CICD_REGISTRY}/plex-webhook:${CICD_EXECUTION_SEQUENCE}
+        image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
         ports:
         - containerPort: 80
