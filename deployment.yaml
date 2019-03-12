@@ -44,6 +44,8 @@ spec:
       labels:
         app: plex-webhook
     spec:
+      imagePullSecrets:
+      - name: pipeline-docker-registry
       containers:
       - name: plex-webhook
         image: ${CICD_REGISTRY}/plex-webhook:${CICD_EXECUTION_SEQUENCE}
