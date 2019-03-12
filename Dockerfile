@@ -6,9 +6,9 @@ EXPOSE 443
 FROM microsoft/dotnet:3.0-sdk-stretch AS build
 WORKDIR /src
 COPY ["webhook.csproj", ""]
-RUN dotnet restore "/webhook.csproj"
+RUN dotnet restore "webhook.csproj"
 COPY . .
-WORKDIR "/src/"
+WORKDIR /src
 RUN dotnet build "webhook.csproj" -c Release -o /app
 
 FROM build AS publish
