@@ -10,17 +10,17 @@
 
     public class RequestResponseLoggingMiddleware
     {
-        private readonly RequestDelegate _next;
+        private readonly RequestDelegate next;
 
         public RequestResponseLoggingMiddleware(RequestDelegate next)
         {
-            _next = next;
+            this.next = next;
         }
 
         public async Task Invoke(HttpContext context)
         {
             //First, get the incoming request
-            var request = await FormatRequest(context.Request);
+            var request = await this.FormatRequest(context.Request);
 
             //Copy a pointer to the original response body stream
             var originalBodyStream = context.Response.Body;
@@ -32,10 +32,10 @@
                 context.Response.Body = responseBody;
 
                 //Continue down the Middleware pipeline, eventually returning to this class
-                await _next(context);
+                await this.next(context);
 
                 //Format the response from the server
-                var response = await FormatResponse(context.Response);
+                var response = await this.FormatResponse(context.Response);
 
                 //TODO: Save log to chosen datastore
 
@@ -72,7 +72,7 @@
             response.Body.Seek(0, SeekOrigin.Begin);
 
             //...and copy it into a string
-            string text = await new StreamReader(response.Body).ReadToEndAsync();
+            var text = await new StreamReader(response.Body).ReadToEndAsync();
 
             //We need to reset the reader for the response so that the client can read it.
             response.Body.Seek(0, SeekOrigin.Begin);
@@ -81,5 +81,4 @@
             return $"{response.StatusCode}: {text}";
         }
     }
-
 }
