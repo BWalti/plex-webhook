@@ -7,18 +7,18 @@ namespace Webhook.Controllers
     [Route("api/[controller]")]
     public class PlexController : ControllerBase
     {
-        private readonly List<PlexWebHook> hooks = new List<PlexWebHook>();
+        private static readonly List<PlexWebHook> Hooks = new List<PlexWebHook>();
 
         [HttpPost]
         public void Post(PlexWebHook hook)
         {
-            this.hooks.Add(hook);
+            Hooks.Add(hook);
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<PlexWebHook>> Get()
         {
-            return this.hooks;
+            return Hooks;
         }
 
         public class PlexWebHook
