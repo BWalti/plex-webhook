@@ -5,6 +5,8 @@ namespace Webhook
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
 
+    using Newtonsoft.Json.Serialization;
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -18,7 +20,10 @@ namespace Webhook
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc()
-                    .AddNewtonsoftJson();
+                    .AddNewtonsoftJson(options =>
+                    {
+                        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
