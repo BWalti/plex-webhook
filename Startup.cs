@@ -20,7 +20,7 @@ namespace Webhook
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLogging(builder => builder.AddConsole());
+            services.AddLogging(builder => builder.AddConsole().AddDebug());
 
             services.AddMvc()
                     .AddNewtonsoftJson(options =>
