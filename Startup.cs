@@ -38,6 +38,8 @@ namespace Webhook
                 app.UseExceptionHandler("/Error");
             }
 
+            app.UseMiddleware<RequestResponseLoggingMiddleware>();
+
             app.UseRouting(routes =>
             {
                 routes.MapApplication();
