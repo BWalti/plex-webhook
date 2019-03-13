@@ -23,10 +23,7 @@ namespace Webhook
             services.AddLogging(builder => builder.AddConsole().AddDebug());
 
             services.AddMvc()
-                    .AddNewtonsoftJson(options =>
-                    {
-                        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                    });
+                    .AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
