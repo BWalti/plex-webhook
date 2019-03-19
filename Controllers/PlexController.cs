@@ -62,9 +62,9 @@ namespace Webhook.Controllers
         }
 
         [HttpPost]
-        public ActionResult<PlexWebHook> Post(PlexWebHook hook)
+        public ActionResult<PlexWebHook> Post(PlexMultipart hook)
         {
-            Hooks.Add(hook);
+            Hooks.Add(hook.payload);
 
             /*
              {"event":"media.pause","user":true,"owner":true,
@@ -79,7 +79,7 @@ namespace Webhook.Controllers
              
              */
 
-            return this.CreatedAtAction(nameof(this.Get), new { id = Hooks.Count - 1 }, hook);
+            return this.CreatedAtAction(nameof(this.Get), new { id = Hooks.Count - 1 }, hook.payload);
         }
 
         [HttpGet]
@@ -92,6 +92,11 @@ namespace Webhook.Controllers
         public ActionResult<PlexWebHook> Get(int id)
         {
             return Hooks[id];
+        }
+
+        public class PlexMultipart
+        {
+            public PlexWebHook payload { get; set; }
         }
 
         public class PlexWebHook
