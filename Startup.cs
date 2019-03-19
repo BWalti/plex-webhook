@@ -6,8 +6,6 @@ namespace Webhook
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
 
-    using Newtonsoft.Json.Serialization;
-
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -37,6 +35,8 @@ namespace Webhook
             {
                 app.UseExceptionHandler("/Error");
             }
+
+            app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
             app.UseRouting(routes =>
             {

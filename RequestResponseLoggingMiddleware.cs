@@ -13,10 +13,9 @@
     {
         private readonly RequestDelegate next;
 
-        private ILogger<RequestResponseLoggingMiddleware> logger;
+        private readonly ILogger<RequestResponseLoggingMiddleware> logger;
 
-        public RequestResponseLoggingMiddleware(RequestDelegate next,
-                                                ILoggerFactory loggerFactory)
+        public RequestResponseLoggingMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
         {
             this.next = next;
             this.logger = loggerFactory
@@ -43,14 +42,11 @@
 
                 //Format the response from the server
                 var response = await this.FormatResponse(context.Response);
-
-                //TODO: Save log to chosen datastore
+                this.logger.LogInformation(response);
 
                 //Copy the contents of the new memory stream (which contains the response) to the original stream, which is then returned to the client.
                 await responseBody.CopyToAsync(originalBodyStream);
             }
-
-
         }
 
         private async Task<string> FormatRequest(HttpRequest request)
