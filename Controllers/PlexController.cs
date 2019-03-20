@@ -1,9 +1,7 @@
 namespace Webhook.Controllers
 {
     using System.Collections.Generic;
-
     using Microsoft.AspNetCore.Mvc;
-
     using Newtonsoft.Json;
 
     [Route("api/[controller]")]
@@ -16,55 +14,55 @@ namespace Webhook.Controllers
         {
             Hooks = new List<PlexWebHook>
                         {
-                            new PlexWebHook
-                                {
-                                    Account = new PlexAccount { Id = 1, Thumb = "thumb", Title = "title" },
-                                    Event = "event",
-                                    Metadata = new PlexMetadata
-                                                   {
-                                                       Thumb = "thumb",
-                                                       Title = "title",
-                                                       AddedAt = 2,
-                                                       Art = "art",
-                                                       GrandparentArt = "grandparentArt",
-                                                       GrandparentKey = "gpKey",
-                                                       GrandparentRatingKey = "gpRK",
-                                                       GrandparentThumb = "gpT",
-                                                       GrandparentTitle = "gpT",
-                                                       Guid = "guid",
-                                                       Index = 3,
-                                                       Key = "key",
-                                                       LibrarySectionId = 4,
-                                                       LibrarySectionType = "lsT",
-                                                       ParentIndex = 5,
-                                                       ParentKey = "pK",
-                                                       ParentRatingKey = "pRK",
-                                                       ParentThumb = "pT",
-                                                       ParentTitle = "pT",
-                                                       RatingCount = 6,
-                                                       RatingKey = "rK",
-                                                       Summary = "summary",
-                                                       Type = "type",
-                                                       UpdatedAt = 7
-                                                   },
-                                    IsOwner = true,
-                                    Player = new PlexPlayer
-                                                 {
-                                                     Title = "title",
-                                                     IsLocal = true,
-                                                     PublicAddress = "200.200.200.200",
-                                                     Uuid = "uuid"
-                                                 },
-                                    Server = new PlexServer { Title = "title", Uuid = "uuid" },
-                                    IsUser = false
-                                }
+                            //new PlexWebHook
+                            //    {
+                            //        Account = new PlexAccount { Id = 1, Thumb = "thumb", Title = "title" },
+                            //        Event = "event",
+                            //        Metadata = new PlexMetadata
+                            //                       {
+                            //                           Thumb = "thumb",
+                            //                           Title = "title",
+                            //                           AddedAt = 2,
+                            //                           Art = "art",
+                            //                           GrandparentArt = "grandparentArt",
+                            //                           GrandparentKey = "gpKey",
+                            //                           GrandparentRatingKey = "gpRK",
+                            //                           GrandparentThumb = "gpT",
+                            //                           GrandparentTitle = "gpT",
+                            //                           Guid = "guid",
+                            //                           Index = 3,
+                            //                           Key = "key",
+                            //                           LibrarySectionId = 4,
+                            //                           LibrarySectionType = "lsT",
+                            //                           ParentIndex = 5,
+                            //                           ParentKey = "pK",
+                            //                           ParentRatingKey = "pRK",
+                            //                           ParentThumb = "pT",
+                            //                           ParentTitle = "pT",
+                            //                           RatingCount = 6,
+                            //                           RatingKey = "rK",
+                            //                           Summary = "summary",
+                            //                           Type = "type",
+                            //                           UpdatedAt = 7
+                            //                       },
+                            //        IsOwner = true,
+                            //        Player = new PlexPlayer
+                            //                     {
+                            //                         Title = "title",
+                            //                         IsLocal = true,
+                            //                         PublicAddress = "200.200.200.200",
+                            //                         Uuid = "uuid"
+                            //                     },
+                            //        Server = new PlexServer { Title = "title", Uuid = "uuid" },
+                            //        IsUser = false
+                            //    }
                         };
         }
 
         [HttpPost]
-        public ActionResult<PlexWebHook> Post(PlexMultipart hook)
+        public ActionResult<PlexWebHook> Post(PlexWebHook hook)
         {
-            Hooks.Add(hook.payload);
+            Hooks.Add(hook);
 
             /*
              {"event":"media.pause","user":true,"owner":true,
@@ -79,7 +77,7 @@ namespace Webhook.Controllers
              
              */
 
-            return this.CreatedAtAction(nameof(this.Get), new { id = Hooks.Count - 1 }, hook.payload);
+            return this.CreatedAtAction(nameof(this.Get), new { id = Hooks.Count - 1 }, hook);
         }
 
         [HttpGet]
@@ -94,11 +92,7 @@ namespace Webhook.Controllers
             return Hooks[id];
         }
 
-        public class PlexMultipart
-        {
-            public PlexWebHook payload { get; set; }
-        }
-
+        [ModelBinder(typeof(JsonWithFilesFormDataModelBinder), Name = "payload")]
         public class PlexWebHook
         {
             [JsonProperty("event")]
