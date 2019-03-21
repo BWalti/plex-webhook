@@ -51,3 +51,20 @@ spec:
         image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
         ports:
         - containerPort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: plex-webhook-external
+  namespace: media
+  labels:
+    traffic-type: external
+spec:
+  rules:
+  - host: pwh.bwalti.net
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: plex-webhook
+          servicePort: 80

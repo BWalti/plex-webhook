@@ -1,7 +1,7 @@
 namespace Webhook
 {
     using System;
-
+    using System.Security.Cryptography;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -9,21 +9,16 @@ namespace Webhook
     using Microsoft.Extensions.Logging;
 
     using Nest;
-
+    using Serilog;
     using Webhook.Eventing;
+    using Webhook.Models;
     using Webhook.Modules;
 
     public class Startup
     {
-        private readonly ElasticClient client;
-
         public Startup(IConfiguration configuration)
         {
             this.Configuration = configuration;
-
-            var node = new Uri("http://192.168.0.20:32423/");
-            var settings = new ConnectionSettings(node);
-            this.client = new ElasticClient(settings);
         }
 
         public IConfiguration Configuration { get; }
@@ -32,11 +27,20 @@ namespace Webhook
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IEventAggregator, EventAggregator>();
+            services.AddLogging(builder => builder.AddConsole().AddDebug());
 
-            services.AddSingleton(this.client);
             services.AddSingleton<SavePlexHookInElasticSearchModule>();
 
-            services.AddLogging(builder => builder.AddConsole().AddDebug());
+            services.AddSingleton(this.Configuration.GetSection("Plex").Get<PlexConfig>());
+            services.AddSingleton(this.Configuration.GetSection("ElasticSearch").Get<ElasticSearchConfig>());
+            services.AddSingleton(provider =>
+            {
+                var esConfig = provider.GetRequiredService<ElasticSearchConfig>();
+
+                var node = new Uri(esConfig.Uri);
+                var settings = new ConnectionSettings(node);
+                return new ElasticClient(settings);
+            });
 
             services.AddMvc()
                     .AddNewtonsoftJson();
@@ -45,10 +49,8 @@ namespace Webhook
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var eventAggregator = app.ApplicationServices.GetService<IEventAggregator>();
-            var esIntegration = app.ApplicationServices.GetService<SavePlexHookInElasticSearchModule>();
-
-            eventAggregator.Subscribe(esIntegration);
+            app.UsePlexApiKey();
+            app.UseSavePlexHooksInElasticSearch();
 
             app.UseRouting(routes =>
             {

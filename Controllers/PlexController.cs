@@ -4,12 +4,10 @@ namespace Webhook.Controllers
     using System.Threading.Tasks;
 
     using Microsoft.AspNetCore.Mvc;
-
+    using Microsoft.Extensions.Configuration;
     using Webhook.Eventing;
     using Webhook.Messages;
-
-    //using Nest;
-
+    using Webhook.Models;
     using Webhook.Models.PlexWebhook;
 
     [Route("api/[controller]")]
@@ -17,6 +15,7 @@ namespace Webhook.Controllers
     public class PlexController : ControllerBase
     {
         private readonly IEventAggregator eventAggregator;
+        private readonly PlexConfig config;
 
         private static readonly List<PlexWebHook> Hooks;
 
@@ -25,14 +24,20 @@ namespace Webhook.Controllers
             Hooks = new List<PlexWebHook>();
         }
 
-        public PlexController(IEventAggregator eventAggregator)
+        public PlexController(IEventAggregator eventAggregator, PlexConfig config)
         {
             this.eventAggregator = eventAggregator;
+            this.config = config;
         }
 
         [HttpPost]
-        public async Task<ActionResult<PlexWebHook>> Post(PlexWebHook hook)
+        public async Task<ActionResult<PlexWebHook>> Post(PlexWebHook hook, [FromQuery]string authKey)
         {
+            if (authKey != this.config.AuthToken)
+            {
+                return this.BadRequest();
+            }
+
             Hooks.Add(hook);
 
             await this.eventAggregator.PublishAsync(new PlexWebHookReceived(hook));

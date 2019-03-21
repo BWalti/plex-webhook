@@ -2,7 +2,7 @@ namespace Webhook
 {
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
-
+    using Microsoft.Extensions.Configuration;
     using Serilog;
     using Serilog.Events;
 
@@ -18,16 +18,21 @@ namespace Webhook
                          .CreateLogger();
 
             Log.Information("Starting the API...");
-            CreateWebHostBuilder(args)
+
+            WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((context, builder) =>
+                {
+                    builder
+                        .AddJsonFile("appsettings.json", false)
+                        .AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", true)
+                        .AddEnvironmentVariables()
+                        .AddCommandLine(args);
+                })
+                .UseStartup<Startup>()
+                .UseSerilog()
                 .Build()
                 .Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
-        {
-            return WebHost.CreateDefaultBuilder(args)
-                          .UseStartup<Startup>()
-                          .UseSerilog();
-        }
     }
 }

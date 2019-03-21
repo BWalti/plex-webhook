@@ -2,22 +2,24 @@
 {
     using System;
     using System.Threading.Tasks;
-
     using Nest;
 
     using Serilog;
 
     using Webhook.Eventing;
     using Webhook.Messages;
+    using Webhook.Models;
     using Webhook.Models.ElasticSearch;
 
     public class SavePlexHookInElasticSearchModule : IHandle<PlexWebHookReceived>
     {
         private readonly ElasticClient elasticClient;
+        private readonly ElasticSearchConfig config;
 
-        public SavePlexHookInElasticSearchModule(ElasticClient elasticClient)
+        public SavePlexHookInElasticSearchModule(ElasticSearchConfig config, ElasticClient client)
         {
-            this.elasticClient = elasticClient;
+            this.config = config;
+            this.elasticClient = client;
         }
 
         public async Task HandleAsync(PlexWebHookReceived message)
@@ -49,7 +51,7 @@
                     IsOwner = message.Content.IsOwner
                 };
 
-            var result = await this.elasticClient.IndexAsync(mapped, idx => idx.Index("simpleplexdoc"));
+            var result = await this.elasticClient.IndexAsync(mapped, idx => idx.Index(this.config.Index));
 
             Log.Information($"Submitting infos to elastic search: {result.IsValid}");
         }
