@@ -1,17 +1,15 @@
-namespace Webhook.Controllers
+namespace Webhook.Converters
 {
     using System;
     using System.Net;
 
     using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
 
     public class IpAddressConverter : JsonConverter<IPAddress>
     {
         public override void WriteJson(JsonWriter writer, IPAddress value, JsonSerializer serializer)
         {
-            var token = JToken.FromObject(value.ToString());
-            token.WriteTo(writer);
+            serializer.Serialize(writer, value.ToString());
         }
 
         public override IPAddress ReadJson(JsonReader reader, Type objectType, IPAddress existingValue, bool hasExistingValue, JsonSerializer serializer)

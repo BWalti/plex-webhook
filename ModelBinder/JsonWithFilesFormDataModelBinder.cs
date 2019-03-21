@@ -1,24 +1,26 @@
-namespace Webhook.Controllers
+namespace Webhook.ModelBinder
 {
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
+
     using Newtonsoft.Json;
 
     public class JsonWithFilesFormDataModelBinder : IModelBinder
     {
-        private readonly IOptions<JsonSerializerSettings> _jsonOptions;
-        private readonly FormFileModelBinder _formFileModelBinder;
+        private readonly IOptions<JsonSerializerSettings> jsonOptions;
+        private readonly FormFileModelBinder formFileModelBinder;
 
         public JsonWithFilesFormDataModelBinder(IOptions<JsonSerializerSettings> jsonOptions, ILoggerFactory loggerFactory)
         {
-            this._jsonOptions = jsonOptions;
-            this._formFileModelBinder = new FormFileModelBinder(loggerFactory);
+            this.jsonOptions = jsonOptions;
+            this.formFileModelBinder = new FormFileModelBinder(loggerFactory);
         }
 
         public async Task BindModelAsync(ModelBindingContext bindingContext)
@@ -39,7 +41,7 @@ namespace Webhook.Controllers
             var rawValue = valueResult.FirstValue;
 
             // Deserialize the JSON
-            var model = JsonConvert.DeserializeObject(rawValue, bindingContext.ModelType, this._jsonOptions.Value);
+            var model = JsonConvert.DeserializeObject(rawValue, bindingContext.ModelType, this.jsonOptions.Value);
 
             // Now, bind each of the IFormFile properties from the other form parts
             foreach (var property in bindingContext.ModelMetadata.Properties.Where(p => p.ModelType == typeof(IFormFile)))
@@ -50,7 +52,7 @@ namespace Webhook.Controllers
                 ModelBindingResult propertyResult;
                 using (bindingContext.EnterNestedScope(property, fieldName, modelName, propertyModel))
                 {
-                    await this._formFileModelBinder.BindModelAsync(bindingContext);
+                    await this.formFileModelBinder.BindModelAsync(bindingContext);
                     propertyResult = bindingContext.Result;
                 }
 
