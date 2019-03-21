@@ -10,6 +10,9 @@ namespace Webhook
 
     using Nest;
 
+    using Webhook.Eventing;
+    using Webhook.Modules;
+
     public class Startup
     {
         private readonly ElasticClient client;
@@ -28,7 +31,10 @@ namespace Webhook
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IEventAggregator, EventAggregator>();
+
             services.AddSingleton(this.client);
+            services.AddSingleton<SavePlexHookInElasticSearchModule>();
 
             services.AddLogging(builder => builder.AddConsole().AddDebug());
 
@@ -39,6 +45,11 @@ namespace Webhook
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var eventAggregator = app.ApplicationServices.GetService<IEventAggregator>();
+            var esIntegration = app.ApplicationServices.GetService<SavePlexHookInElasticSearchModule>();
+
+            eventAggregator.Subscribe(esIntegration);
+
             app.UseRouting(routes =>
             {
                 routes.MapDefaultControllerRoute();
