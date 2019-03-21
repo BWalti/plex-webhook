@@ -4,7 +4,6 @@ namespace Webhook.Controllers
     using System.Threading.Tasks;
 
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Configuration;
     using Webhook.Eventing;
     using Webhook.Messages;
     using Webhook.Models;
@@ -46,14 +45,16 @@ namespace Webhook.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<PlexWebHook>> Get()
+        public async Task<ActionResult<IEnumerable<PlexWebHook>>> Get()
         {
+            await Task.Delay(0);
             return this.Ok(Hooks);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<PlexWebHook> Get(int id)
+        public async Task<ActionResult<PlexWebHook>> Get(int id)
         {
+            await Task.Delay(0);
             return this.Ok(Hooks[id]);
         }
     }
