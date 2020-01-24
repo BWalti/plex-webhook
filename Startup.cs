@@ -1,7 +1,6 @@
 namespace Webhook
 {
     using System;
-    using System.Security.Cryptography;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -9,7 +8,6 @@ namespace Webhook
     using Microsoft.Extensions.Logging;
 
     using Nest;
-    using Serilog;
     using Webhook.Eventing;
     using Webhook.Models;
     using Webhook.Modules;
@@ -29,7 +27,7 @@ namespace Webhook
             services.AddSingleton<IEventAggregator, EventAggregator>();
             services.AddLogging(builder => builder.AddConsole().AddDebug());
 
-            services.AddSingleton<SavePlexHookInElasticSearchModule>();
+            //services.AddSingleton<SavePlexHookInElasticSearchModule>();
 
             services.AddSingleton(this.Configuration.GetSection("Plex").Get<PlexConfig>());
             services.AddSingleton(this.Configuration.GetSection("ElasticSearch").Get<ElasticSearchConfig>());
@@ -50,11 +48,12 @@ namespace Webhook
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UsePlexApiKey();
-            app.UseSavePlexHooksInElasticSearch();
+            //app.UseSavePlexHooksInElasticSearch();
 
-            app.UseRouting(routes =>
+            app.UseRouting();
+            app.UseEndpoints(routes =>
             {
-                routes.MapDefaultControllerRoute();
+                routes.MapControllers();
             });
         }
     }

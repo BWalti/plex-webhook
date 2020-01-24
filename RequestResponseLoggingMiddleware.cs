@@ -6,7 +6,6 @@
     using System.Threading.Tasks;
 
     using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Http.Internal;
     using Microsoft.Extensions.Logging;
 
     public class RequestResponseLoggingMiddleware
@@ -52,7 +51,7 @@
         private async Task<string> FormatRequest(HttpRequest request)
         {
             //This line allows us to set the reader for the request back at the beginning of its stream.
-            request.EnableRewind();
+            request.EnableBuffering();
             request.Body.Seek(0, SeekOrigin.Begin);
 
             //We now need to read the request stream.  First, we create a new byte[] with the same length as the request stream...

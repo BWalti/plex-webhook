@@ -12,8 +12,7 @@ namespace Webhook.Models.PlexWebhook
         public bool IsLocal { get; set; }
 
         [JsonProperty("publicAddress")]
-        [JsonConverter(typeof(IpAddressConverter))]
-        public IPAddress PublicAddress { get; set; }
+        public string PublicAddress { get; set; }
 
         [JsonProperty("title")]
         public string Title { get; set; }
